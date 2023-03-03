@@ -1,13 +1,13 @@
 import {StatusBar} from 'expo-status-bar';
 import {StyleSheet, Text, View} from 'react-native';
 import {Provider} from 'react-redux';
-import appStore from './store/appStore';
+import generalSlice from './store/generalStore';
 import {configureStore} from '@reduxjs/toolkit';
 import MainNavigation from './navigation/MainNavigation';
 
 const store = configureStore({
 	reducer: {
-		appStore,
+		generalSlice,
 	},
 });
 

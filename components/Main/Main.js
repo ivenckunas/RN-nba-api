@@ -1,26 +1,28 @@
-import {ScrollView, Text, Image, StyleSheet, View} from 'react-native';
+import {ScrollView, Text, Image, StyleSheet, View, Modal, Pressable} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios';
 import {Button, ThemeProvider, SearchBar} from '@rneui/themed';
+import {useDispatch, useSelector} from 'react-redux';
+import {setModalVisible, setNewsArr, setSearch} from '../../store/generalStore';
+import ModalComp from './ModalComp';
 
 const Main = () => {
-	const [newsArr, setNewsArr] = useState();
+	const dispatch = useDispatch();
+	const {newsArr, search, modalVisible} = useSelector((state) => state.generalSlice);
 
 	useEffect(() => {
-		axios.get('http://api.mediastack.com/v1/news?access_key=34c780bda21009df9e73fe632f8d33a5&keywords=nba&countries=us,gb&sources=cnn,-bbc').then((res) => setNewsArr(res.data.data));
-	}, [setSearch, setNewsArr, search]);
-
-	const [search, setSearch] = useState('');
+		axios.get('http://api.mediastack.com/v1/news?access_key=34c780bda21009df9e73fe632f8d33a5&keywords=nba&countries=us,gb&sources=cnn,-bbc').then((res) => dispatch(setNewsArr(res.data.data)));
+	}, []);
 
 	const updateArrBySearch = (search) => {
-		setSearch(search);
+		dispatch(setSearch(search));
 		if (search.trim() === '') {
 			// If the search query is empty, update the news array from the API fetch
-			axios.get('http://api.mediastack.com/v1/news?access_key=34c780bda21009df9e73fe632f8d33a5&keywords=nba&countries=us,gb&sources=cnn,-bbc').then((res) => setNewsArr(res.data.data));
+			axios.get('http://api.mediastack.com/v1/news?access_key=34c780bda21009df9e73fe632f8d33a5&keywords=nba&countries=us,gb&sources=cnn,-bbc').then((res) => dispatch(setNewsArr(res.data.data)));
 		} else {
 			// If the search query is not empty, filter the news array based on the search query
 			const filtered = newsArr.filter((singleArticle) => singleArticle.title.toLowerCase().includes(search.toLowerCase()));
-			setNewsArr(filtered);
+			dispatch(setNewsArr(filtered));
 		}
 	};
 
@@ -51,9 +53,11 @@ const Main = () => {
 						<Button
 							title={'Read full article'}
 							containerStyle={styles.button}
+							onPress={() => dispatch(setModalVisible(!modalVisible))}
 						/>
 					</View>
 				))}
+			<ModalComp />
 		</ScrollView>
 	);
 };
